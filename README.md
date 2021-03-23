@@ -1,53 +1,43 @@
-# Folder Structure:
+# Lab Task-6 Crosslingual Transfer for Inflection Generation
 
-	Main folder name: 19075024-Chinmay-Choubisa
+## Morphological Generation -
+Morphological generation may be considered an opposite task of morphological analysis. Here, given the description of a word in terms of number, category, stem, and so on, the original word is retrieved. For example, if root = go, part of speech = verb, tense= present, and if it occurs along with a third person and singular subject, then a morphological generator would generate its surface form, goes.
 
-	Main folder contain README.md, graph_outputs , model_weights, output and 2 .ipynb file of each language ,i.e. hindi and urdu.
-	In the output folder there are feature_0(POS), feature_1(gender), feature_2(singular/pural), feature_3(person), feature_4(case), feature_5(tense-aspect-mood (TAM)).
+## About the task -
+The task is the following: given a lemma and a bundle of morphological features, generate a target inflected form. The goal as instructed by sir (I have asked sir if I can do this or not instead of the task for single language and he agreed to this) is to perform morphological inflection in the low-resource language, having hopefully exploited some similarity to the high-resource language. Thus first the model for high resource language is trained(Hindi in Hindi--Bengali and German in German--middle-high-German). And then this model is used to train the model for the low resource language. 
 
+Test input:
 
-# Motivation:
+    body	V;V.PTCP;PRS
+    randomise	V;V.PTCP;PST
+Output:
 
-	To do morphological analysis for hindi and urdu (morphologically rich lannguages).
+    body	bodying	V;V.PTCP;PRS
+    randomise	randomised	V;V.PTCP;PST
 
+## Dataset used -
+The dataset used is taken from the following git repository as instructed by sir:
+> https://github.com/sigmorphon/2019/tree/master/task1
 
-# Introduction:
+Two sets of two languages are taken from here-
+- Hindi--Bengali Dataset (Hindi being the high resource language and Bengali being the low resource language)
+- German--middle-high-German Dataset (German being the high resource language and middle-high-German being the low resource language)
+ We can train the model of low resource language using the high resource language due to similarity in features such as same script.
+ 
+ NOTE: The folder of the dataset used is inside the conll2019/task1/ folder inside the given link.
+ 
+ ## Code used:
+ I have used the code from the following git repository:
+ > https://github.com/axsemantics/sigmorphon2019-task1
+ 
+ I have asked sir if I can use this code and he said yes to this.
+ 
+ The Jupyter Notebook for the respective dataset is uploaded here as well as in the folders that opens from the links.
+ 
+ ***NOTE: In both the set of the languages we first train only the low resource data using the sigmorphan/all_train_2019task1.sh script and take it as the baseline(Mentioned in the Jupyter Notebook) and it makes the system_1. Then we train the cross-lingual model(as mentioned in the Jupyter Notebook)  
+  and it makes system_2.*
+## Libraries used:
+- allennlp - AllenNLP is the deep learning library for NLP. Using AllenNLP to develop a model is much easier than building a model by PyTorch from scratch. Not only it provides easier development but also supports the management of the experiments and its evaluation after development.
+- click - Click is a Python package for creating beautiful command line interfaces in a composable way with as little code as necessary.
 
-	A morpheme is the smallest meaningful word in a sentence or a phrase in any language. In well-spaced sentences , Morphological Analysis(MA) is the first step in Neuro-Linguistic Programming(NLP), in which a sentence is divided into a sequence of morphemes and then we determine parts of speech of the segmented morpheme. Morphological analysis (MA) is a method for identifying, structuring and investigating the total set of possible relationships contained in a given multidimensional problem complex. MA allows small groups of subject specialists to define, link, and internally evaluate the parameters of complex problem spaces, creating a solution space and a flexible inference mode.
-
-
-# Tools used:
-
-	h5py, numpy, Keras, tensorflow, Keras-Applications, Keras-Preprocessing, PyYAML, matplotlib, scikit-learn
-
-
-# Dataset used:
-
-	Data used can be extracted from: http://ltrc.iiit.ac.in/hutb_release/
-
-
-->All important results and scripts are available at link: https://drive.google.com/drive/folders/1Xyt5HwTsGkAmERpkU7li_tSCUFfrpnSV?usp=sharing
-
-
-# Procedure:
-
-	 1. train and test modes operate upon the standard train-test split specified by the HDTB and UDTB datasets
-	 2. In model training, we are using convolutional neural network and recurrent neural networks model combined together(CNN-RNN model). The model will	predict Lemma, POS category, Gender, Number, Person, Case, and Tense-aspect-mood (TAM).
-	 3. After train, test the model.
-	 4. Last step is prediction. We have providedd data manually for prediction.
-	 5. Commmands to execute 
-	 	-> !pip install funcsigs
-			!python main.py --lang urdu --mode train --phonetic true --freezing true # training 
-		-> !python main.py --lang urdu --mode test --phonetic true --freezing true #test
-		-> !python main.py --lang urdu --mode predict --phonetic true --freezing true #prediction
-		Note: For Hindi dataset just replace "urdu" in above commands as "hindi"
-
-
-# Results
-	
-	For urdu: 
-		-> val_loss did not improve from 1.37210
-		-> max time_dist_2_acc 0.9702 and val_time_dist_2_acc 0.9681
-	For Hindi :
-		-> val_loss improved from 0.80534 to 0.80222
-		-> max time_dist_2_acc 0.9806 and val_time_dist_2_acc 0.9845
+NOTE: Debugging is required at one place after installing the allennlp library. Inside the usr/local/lib/python 3.7/dist-packages/allennlp/nn/beam_search.py at line 227 replace the line with this - backpointer = restricted_beam_indices // self.per_node_beam_size
